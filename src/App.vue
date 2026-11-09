@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import AppCounter from './components/AppCounter.vue'
+import TodoList from './components/TodoList.vue'
 </script>
 
 <template>
   <main>
     <h1>Vue exercises</h1>
-    <AppCounter />
+    <div class="exercises">
+      <AppCounter />
+      <TodoList />
+    </div>
   </main>
 </template>
 
@@ -30,8 +34,16 @@ body {
 
 <style scoped>
 main {
-  max-width: 60rem;
+  max-width: 90rem;
   margin-inline: auto;
   padding: 1rem;
+}
+
+/* One column on phones; a new column whenever there is room for 20rem more. */
+.exercises {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr));
+  gap: 1rem;
+  align-items: start;
 }
 </style>
