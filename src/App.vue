@@ -39,10 +39,11 @@ main {
   padding: 1rem;
 }
 
-/* One column on phones; a new column whenever there is room for 20rem more. */
+/* One column on phones; a new column whenever there is room for 20rem more.
+   auto-fill keeps empty tracks, so each exercise card stays card-sized. */
 .exercises {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(20rem, 100%), 1fr));
   gap: 1rem;
   align-items: start;
 }

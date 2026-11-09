@@ -23,3 +23,4 @@ npm run dev
 | Day | Topic |
 | --- | --- |
 | Monday | Getting started: `ref`, template syntax, first component (`AppCounter`) |
+| Tuesday | Directives and lists: `v-if`, `v-show`, `v-for` with `:key`, `v-model` and its modifiers (`TodoList`) |

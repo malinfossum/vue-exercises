@@ -35,7 +35,6 @@ function reset() {
   display: grid;
   gap: 0.75rem;
   width: 100%;
-  max-width: 20rem;
   padding: 1rem;
   border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
   border-radius: 0.5rem;
