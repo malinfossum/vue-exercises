@@ -12,7 +12,12 @@ const tasks = ref<Task[]>([
   { id: 2, text: "Write Tuesday's code", done: true },
 ])
 const newTask = ref('')
+const filter = ref('')
 let nextId = 3
+
+function matches(task: Task) {
+  return task.text.toLowerCase().includes(filter.value.toLowerCase())
+}
 
 function addTask() {
   const text = newTask.value.trim()
@@ -41,9 +46,13 @@ function removeTask(id: number) {
       <button type="submit">Add</button>
     </form>
 
+    <label class="visually-hidden" for="filter">Filter tasks</label>
+    <input id="filter" v-model.trim="filter" type="search" placeholder="Filter..." />
+
     <p v-if="tasks.length === 0" class="empty">No tasks yet.</p>
+    <p v-else-if="!tasks.some(matches)" class="empty">No tasks match "{{ filter }}".</p>
     <ul v-else class="list">
-      <li v-for="task in tasks" :key="task.id" :class="{ done: task.done }">
+      <li v-for="task in tasks.filter(matches)" :key="task.id" :class="{ done: task.done }">
         <label class="task">
           <input type="checkbox" :checked="task.done" @change="toggleTask(task)" />
           <span>{{ task.text }}</span>
@@ -54,9 +63,9 @@ function removeTask(id: number) {
       </li>
     </ul>
 
-    <p class="summary">
-      {{ tasks.length }} tasks, {{ tasks.filter((t) => t.done).length }} done
-    </p>
+    <p v-if="tasks.length === 0" class="summary">No tasks</p>
+    <p v-else-if="tasks.length === 1" class="summary">One task</p>
+    <p v-else class="summary">{{ tasks.length }} tasks</p>
   </section>
 </template>
 
