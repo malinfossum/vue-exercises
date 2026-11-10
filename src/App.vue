@@ -30,6 +30,31 @@ import TodoList from './components/TodoList.vue'
 body {
   margin: 0;
 }
+
+/* Base controls live here, not in each component: scoped CSS stops at a
+   child component's root, so TodoForm and TodoItem would never see it. */
+input:not([type='checkbox']),
+button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 0.75rem;
+  border: 1px solid color-mix(in srgb, currentColor 40%, transparent);
+  border-radius: 0.375rem;
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 </style>
 
 <style scoped>

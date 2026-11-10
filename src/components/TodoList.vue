@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import TodoForm from './TodoForm.vue'
+import TodoItem from './TodoItem.vue'
+import TodoStats from './TodoStats.vue'
+import type { Task } from '../types'
 
-type Task = {
-  id: number
-  text: string
-  done: boolean
-}
-
+// The parent owns the state. Children get props and send emits back.
 const tasks = ref<Task[]>([
   { id: 1, text: 'Buy coffee', done: false },
   { id: 2, text: "Write Tuesday's code", done: true },
@@ -27,8 +26,10 @@ function addTask() {
   newTask.value = ''
 }
 
-function toggleTask(task: Task) {
-  task.done = !task.done
+// Takes an id now, because that is what TodoItem emits.
+function toggleTask(id: number) {
+  const task = tasks.value.find((t) => t.id === id)
+  if (task) task.done = !task.done
 }
 
 function removeTask(id: number) {
@@ -40,11 +41,7 @@ function removeTask(id: number) {
   <section class="todo" aria-labelledby="todo-title">
     <h2 id="todo-title">Tasks</h2>
 
-    <form class="add" @submit.prevent="addTask">
-      <label class="visually-hidden" for="new-task">New task</label>
-      <input id="new-task" v-model.trim="newTask" placeholder="Write a task..." />
-      <button type="submit">Add</button>
-    </form>
+    <TodoForm v-model="newTask" @add="addTask" />
 
     <label class="visually-hidden" for="filter">Filter tasks</label>
     <input id="filter" v-model.trim="filter" type="search" placeholder="Filter..." />
@@ -52,20 +49,12 @@ function removeTask(id: number) {
     <p v-if="tasks.length === 0" class="empty">No tasks yet.</p>
     <p v-else-if="!tasks.some(matches)" class="empty">No tasks match "{{ filter }}".</p>
     <ul v-else class="list">
-      <li v-for="task in tasks.filter(matches)" :key="task.id" :class="{ done: task.done }">
-        <label class="task">
-          <input type="checkbox" :checked="task.done" @change="toggleTask(task)" />
-          <span>{{ task.text }}</span>
-        </label>
-        <button type="button" :aria-label="`Delete ${task.text}`" @click="removeTask(task.id)">
-          Delete
-        </button>
+      <li v-for="task in tasks.filter(matches)" :key="task.id">
+        <TodoItem :task="task" @toggle="toggleTask" @remove="removeTask" />
       </li>
     </ul>
 
-    <p v-if="tasks.length === 0" class="summary">No tasks</p>
-    <p v-else-if="tasks.length === 1" class="summary">One task</p>
-    <p v-else class="summary">{{ tasks.length }} tasks</p>
+    <TodoStats :total="tasks.length" :done="tasks.filter((t) => t.done).length" />
   </section>
 </template>
 
@@ -83,29 +72,6 @@ h2 {
   font-size: 1.25rem;
 }
 
-.add {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.add input {
-  flex: 1;
-  min-width: 0;
-}
-
-input:not([type='checkbox']),
-button {
-  min-height: 44px;
-  padding: 0 0.75rem;
-  border: 1px solid color-mix(in srgb, currentColor 40%, transparent);
-  border-radius: 0.375rem;
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-}
-
 .list {
   display: grid;
   gap: 0.25rem;
@@ -121,42 +87,7 @@ button {
   gap: 0.5rem;
 }
 
-.task {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  gap: 0.75rem;
-  min-height: 44px;
-  cursor: pointer;
-}
-
-.task input {
-  width: 1.25rem;
-  height: 1.25rem;
+.empty {
   margin: 0;
-}
-
-.done span {
-  text-decoration: line-through;
-  opacity: 0.6;
-}
-
-.empty,
-.summary {
-  margin: 0;
-}
-
-.summary {
-  font-size: 0.875rem;
-  opacity: 0.75;
-}
-
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
 }
 </style>

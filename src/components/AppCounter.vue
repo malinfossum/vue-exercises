@@ -66,14 +66,4 @@ function reset() {
   flex-wrap: wrap;
   gap: 0.5rem;
 }
-
-button {
-  min-width: 44px;
-  min-height: 44px;
-  padding: 0 1rem;
-  border: 1px solid color-mix(in srgb, currentColor 40%, transparent);
-  border-radius: 0.375rem;
-  font: inherit;
-  cursor: pointer;
-}
 </style>
