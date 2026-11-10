@@ -21,8 +21,9 @@ const isAboutOpen = ref(false)
       <AppBox><TodoList /></AppBox>
     </div>
 
-    <AppModal v-if="isAboutOpen" aria-labelledby="about-title" @close="isAboutOpen = false">
-      <h2 id="about-title">About this app</h2>
+    <!-- No #actions here, so AppModal shows its fallback OK button. -->
+    <AppModal v-if="isAboutOpen" @close="isAboutOpen = false">
+      <template #title>About this app</template>
       <p>My drills for the Vue module of the GET Academy frontend course, one exercise per day.</p>
       <p>Built with Vue 3, TypeScript and Vite.</p>
     </AppModal>
@@ -86,11 +87,6 @@ main {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-}
-
-h2 {
-  margin: 0;
-  font-size: 1.25rem;
 }
 
 p {

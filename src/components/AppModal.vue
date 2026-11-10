@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, useTemplateRef } from 'vue'
+import { onBeforeUnmount, onMounted, useId, useTemplateRef } from 'vue'
 
 // No props and no open/closed state. The parent decides with v-if whether the
-// modal exists at all; the modal shows its slot and says "close" when asked.
+// modal exists at all; the modal shows its slots and says "close" when asked.
 const emit = defineEmits<{ close: [] }>()
 
 const dialog = useTemplateRef('dialog')
+// A unique id per modal, so the dialog can point at its own heading.
+const titleId = useId()
 let opener: HTMLElement | null = null
 
 onMounted(() => {
@@ -26,12 +28,27 @@ onBeforeUnmount(() => {
 
 <template>
   <!-- Esc fires `cancel`. .prevent stops the browser closing the dialog on its
-       own: the parent owns the state, so the parent closes it via v-if. -->
-  <dialog ref="dialog" class="modal" @cancel.prevent="emit('close')">
+       own: the parent owns the state, so the parent closes it via v-if.
+       @click.self: a click on the backdrop lands on the <dialog> itself;
+       a click on the content lands on something inside it. -->
+  <dialog
+    ref="dialog"
+    class="modal"
+    :aria-labelledby="$slots.title ? titleId : undefined"
+    @cancel.prevent="emit('close')"
+    @click.self="emit('close')"
+  >
     <div class="content">
+      <!-- The modal owns the heading element and its id; the parent only
+           fills in the words. -->
+      <h2 v-if="$slots.title" :id="titleId" class="title"><slot name="title" /></h2>
       <slot />
-      <!-- autofocus: the safe button gets focus first, never "Yes, delete". -->
-      <button type="button" autofocus @click="emit('close')">OK</button>
+      <div class="actions">
+        <!-- Fallback content: shown only when the parent sends no #actions. -->
+        <slot name="actions">
+          <button type="button" autofocus @click="emit('close')">OK</button>
+        </slot>
+      </div>
     </div>
   </dialog>
 </template>
@@ -50,13 +67,26 @@ onBeforeUnmount(() => {
   background-color: rgb(0 0 0 / 0.6);
 }
 
+/* The padding sits here, not on <dialog>, so a click on the padding counts
+   as "inside" and does not close the modal. */
 .content {
   display: grid;
   gap: 0.75rem;
   padding: 1.5rem;
 }
 
-.content > button {
-  justify-self: start;
+/* The modal styles the title area; the parent styles the body it sends in. */
+.title {
+  margin: 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+  font-size: 1.25rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
 }
 </style>

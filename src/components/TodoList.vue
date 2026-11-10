@@ -80,12 +80,14 @@ async function confirmDelete() {
     <TodoStats :total="tasks.length" :done="tasks.filter((t) => t.done).length" />
 
     <!-- v-if on the component: closed = not in the DOM at all.
-         aria-labelledby is not a prop of AppModal, so Vue passes it through
-         to the modal's root element, the <dialog>. -->
-    <AppModal v-if="taskToDelete" aria-labelledby="delete-title" @close="cancelDelete">
-      <h2 id="delete-title">Delete this task?</h2>
+         Loose nodes go to the default slot; <template #name> fills a named one. -->
+    <AppModal v-if="taskToDelete" @close="cancelDelete">
+      <template #title>Delete this task?</template>
       <p>"{{ taskToDelete.text }}" will be deleted for good.</p>
-      <button type="button" class="danger" @click="confirmDelete">Yes, delete</button>
+      <template #actions>
+        <button type="button" autofocus @click="cancelDelete">Cancel</button>
+        <button type="button" class="danger" @click="confirmDelete">Yes, delete</button>
+      </template>
     </AppModal>
   </section>
 </template>
@@ -127,7 +129,6 @@ p {
 }
 
 .danger {
-  justify-self: start;
   border-color: #e5484d;
   background-color: #e5484d;
   color: white;
