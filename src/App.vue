@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppBox from './components/AppBox.vue'
 import AppCounter from './components/AppCounter.vue'
 import TodoList from './components/TodoList.vue'
 </script>
@@ -7,8 +8,9 @@ import TodoList from './components/TodoList.vue'
   <main>
     <h1>Vue exercises</h1>
     <div class="exercises">
-      <AppCounter />
-      <TodoList />
+      <!-- One frame, two different contents: the card style lives in AppBox only. -->
+      <AppBox><AppCounter /></AppBox>
+      <AppBox><TodoList /></AppBox>
     </div>
   </main>
 </template>

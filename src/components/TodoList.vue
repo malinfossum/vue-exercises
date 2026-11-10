@@ -62,9 +62,6 @@ function removeTask(id: number) {
 .todo {
   display: grid;
   gap: 0.75rem;
-  padding: 1rem;
-  border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
-  border-radius: 0.5rem;
 }
 
 h2 {
