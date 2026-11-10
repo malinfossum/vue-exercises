@@ -1,17 +1,31 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import AppBox from './components/AppBox.vue'
 import AppCounter from './components/AppCounter.vue'
+import AppModal from './components/AppModal.vue'
 import TodoList from './components/TodoList.vue'
+
+// Same AppModal as the delete dialog, different content, its own state.
+const isAboutOpen = ref(false)
 </script>
 
 <template>
   <main>
-    <h1>Vue exercises</h1>
+    <header class="top">
+      <h1>Vue exercises</h1>
+      <button type="button" @click="isAboutOpen = true">About</button>
+    </header>
     <div class="exercises">
       <!-- One frame, two different contents: the card style lives in AppBox only. -->
       <AppBox><AppCounter /></AppBox>
       <AppBox><TodoList /></AppBox>
     </div>
+
+    <AppModal v-if="isAboutOpen" aria-labelledby="about-title" @close="isAboutOpen = false">
+      <h2 id="about-title">About this app</h2>
+      <p>My drills for the Vue module of the GET Academy frontend course, one exercise per day.</p>
+      <p>Built with Vue 3, TypeScript and Vite.</p>
+    </AppModal>
   </main>
 </template>
 
@@ -64,6 +78,23 @@ main {
   max-width: 90rem;
   margin-inline: auto;
   padding: 1rem;
+}
+
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+p {
+  margin: 0;
 }
 
 /* One column on phones; a new column whenever there is room for 20rem more.

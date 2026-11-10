@@ -16,8 +16,24 @@ describe('TodoList', () => {
     expect(wrapper.text()).toContain('3 tasks, 2 done')
 
     await wrapper.get('button[aria-label="Delete Push to GitHub"]').trigger('click')
+    expect(wrapper.get('dialog').text()).toContain('"Push to GitHub" will be deleted')
+    await wrapper.get('button.danger').trigger('click')
+    expect(wrapper.find('dialog').exists()).toBe(false)
     expect(wrapper.text()).not.toContain('Push to GitHub')
     expect(wrapper.text()).toContain('2 tasks, 1 done')
+  })
+
+  it('keeps the task when the delete dialog is closed with OK or Esc', async () => {
+    const wrapper = mount(TodoList)
+
+    await wrapper.get('button[aria-label="Delete Buy coffee"]').trigger('click')
+    await wrapper.get('dialog button[autofocus]').trigger('click')
+    expect(wrapper.find('dialog').exists()).toBe(false)
+
+    await wrapper.get('button[aria-label="Delete Buy coffee"]').trigger('click')
+    await wrapper.get('dialog').trigger('cancel')
+    expect(wrapper.find('dialog').exists()).toBe(false)
+    expect(wrapper.findAll('li')).toHaveLength(2)
   })
 
   it('ignores a task that is only spaces', async () => {
