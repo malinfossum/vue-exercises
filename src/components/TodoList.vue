@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
+import AppModal from './AppModal.vue'
 import TodoForm from './TodoForm.vue'
 import TodoItem from './TodoItem.vue'
 import TodoStats from './TodoStats.vue'
@@ -35,6 +36,28 @@ function toggleTask(id: number) {
 function removeTask(id: number) {
   tasks.value = tasks.value.filter((task) => task.id !== id)
 }
+
+// One piece of state for the delete dialog: which task is waiting for a yes.
+// null = closed. The open flag is derived from it, so the two can never disagree.
+const deleteId = ref<number | null>(null)
+const taskToDelete = computed(() => tasks.value.find((t) => t.id === deleteId.value))
+
+function askDelete(id: number) {
+  deleteId.value = id
+}
+
+function cancelDelete() {
+  deleteId.value = null
+}
+
+async function confirmDelete() {
+  if (deleteId.value !== null) removeTask(deleteId.value)
+  deleteId.value = null
+  // The Delete button that opened the modal is gone with its task, so focus
+  // would fall back to <body>. Wait for Vue to update the DOM, then pick a spot.
+  await nextTick()
+  document.getElementById('new-task')?.focus()
+}
 </script>
 
 <template>
@@ -50,11 +73,22 @@ function removeTask(id: number) {
     <p v-else-if="!tasks.some(matches)" class="empty">No tasks match "{{ filter }}".</p>
     <ul v-else class="list">
       <li v-for="task in tasks.filter(matches)" :key="task.id">
-        <TodoItem :task="task" @toggle="toggleTask" @remove="removeTask" />
+        <TodoItem :task="task" @toggle="toggleTask" @remove="askDelete" />
       </li>
     </ul>
 
     <TodoStats :total="tasks.length" :done="tasks.filter((t) => t.done).length" />
+
+    <!-- v-if on the component: closed = not in the DOM at all.
+         Loose nodes go to the default slot; <template #name> fills a named one. -->
+    <AppModal v-if="taskToDelete" @close="cancelDelete">
+      <template #title>Delete this task?</template>
+      <p>"{{ taskToDelete.text }}" will be deleted for good.</p>
+      <template #actions>
+        <button type="button" autofocus @click="cancelDelete">Cancel</button>
+        <button type="button" class="danger" @click="confirmDelete">Yes, delete</button>
+      </template>
+    </AppModal>
   </section>
 </template>
 
@@ -62,9 +96,6 @@ function removeTask(id: number) {
 .todo {
   display: grid;
   gap: 0.75rem;
-  padding: 1rem;
-  border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
-  border-radius: 0.5rem;
 }
 
 h2 {
@@ -89,5 +120,17 @@ h2 {
 
 .empty {
   margin: 0;
+}
+
+/* Slot content is compiled here, so TodoList's scoped styles reach it,
+   even though it renders inside AppModal. */
+p {
+  margin: 0;
+}
+
+.danger {
+  border-color: #e5484d;
+  background-color: #e5484d;
+  color: white;
 }
 </style>
